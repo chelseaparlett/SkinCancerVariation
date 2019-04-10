@@ -4,7 +4,6 @@ library(imager)
 library(openxlsx)
 library(wvtool)
 library(readbitmap)
-library(convertGraph)
 #what about average intensity of all, RGB colors?
 #functions------------------------------------------------------
 MSE <- function(iMSmall){
@@ -40,24 +39,22 @@ MSEAll <- function(imMat){
   return(mse)
 }
 #data-----------------------------------------------------------
-setwd("/Users/chelseaparlett/Desktop/DIP/PH2Dataset/PH2 Dataset images")
+setwd("/Users/chelseaparlett/Desktop/Desktop/GitHub/CancerClassification/PH2Dataset/PH2 Dataset images")
 diagDat <- read.csv(file.choose())
 
 ims <- Sys.glob("IMD[0-9][0-9][0-9]/IMD[0-9][0-9][0-9]_Dermoscopic_Image/IMD[0-9][0-9][0-9].bmp")
 imsList <- lapply(ims,FUN = load.image) #numbered list of image objects
 names(imsList) <- lapply(ims,function(x) substr(x,33,38))
 
-masks <- Sys.glob("IMD[0-9][0-9][0-9]/IMD[0-9][0-9][0-9]_lesion/IMD[0-9][0-9][0-9]_lesion.bmp")
-masksNew <- sapply(masks, function(x) paste0(substr(x,1,35),"jpg"))
-
-
-maskList <- lapply(masksNew,FUN = load.image) #numbered list of image objects
+masks <- Sys.glob("IMD[0-9][0-9][0-9]/IMD[0-9][0-9][0-9]_lesion/IMD[0-9][0-9][0-9]_lesion.jpg")
+maskList <- lapply(masks,FUN = load.image) #numbered list of image objects
 names(maskList) <- lapply(masks,function(x) substr(x,22,27))
+maskMatrix <- lapply(maskList,FUN = as.matrix)
 
-k <- mapply(FUN = convertGraph, masks, masksNew, path = "/Users/chelseaparlett/Downloads/phantom/bin/phantomjs")
+
 #---show--------------------------------------------------------
 plot(imsList[[round(runif(1,1,200))]])
-
+plot(maskList[[round(runif(1,1,200))]])
 
 #---looking at full Image---------------------------------------
 MSEallCols <- sapply(imsList, MSEAll)
